@@ -1,0 +1,56 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply font-sans text-gray-900 bg-stone-50 antialiased;
+  }
+
+  h1, h2, h3 {
+    @apply font-serif;
+  }
+}
+
+@layer components {
+  .nav-link {
+    @apply text-sm text-gray-600 hover:text-gray-900 transition-colors duration-150;
+  }
+
+  .pill {
+    @apply inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-all duration-150 cursor-pointer select-none;
+  }
+
+  .pill-active {
+    @apply bg-gray-900 text-white;
+  }
+
+  .pill-inactive {
+    @apply bg-white text-gray-700 border border-gray-200 hover:border-gray-400;
+  }
+
+  .btn-primary {
+    @apply bg-gray-900 text-white text-sm font-medium px-5 py-2.5 rounded-full hover:bg-gray-700 transition-colors duration-150;
+  }
+
+  .btn-outline {
+    @apply border border-gray-300 text-gray-700 text-sm font-medium px-5 py-2.5 rounded-full hover:border-gray-900 hover:text-gray-900 transition-colors duration-150;
+  }
+}
+
+/* Smooth card hover */
+.book-card-img {
+  transition: transform 0.35s ease;
+}
+.book-card:hover .book-card-img {
+  transform: scale(1.03);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 99px; }
