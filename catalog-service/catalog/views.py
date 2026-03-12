@@ -4,9 +4,13 @@ from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from .models import Category
 from .serializers import CategorySerializer, CategoryWriteSerializer
+from .auth import ManagerJWTAuthentication
+from .permissions import IsManagerOrReadOnly
 
 
 class CategoryListView(APIView):
+    authentication_classes = [ManagerJWTAuthentication]
+    permission_classes = [IsManagerOrReadOnly]
     """GET /api/catalog/categories/ — list root categories with children."""
 
     def get(self, request):
@@ -23,6 +27,8 @@ class CategoryListView(APIView):
 
 class CategoryDetailView(APIView):
     """GET/PUT/DELETE /api/catalog/categories/<id>/"""
+    authentication_classes = [ManagerJWTAuthentication]
+    permission_classes = [IsManagerOrReadOnly]
 
     def get(self, request, pk):
         category = get_object_or_404(Category, pk=pk)

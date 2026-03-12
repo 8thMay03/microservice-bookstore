@@ -11,9 +11,6 @@ import CartSidebar from "./CartSidebar";
 const NAV_LINKS = [
   { to: "/", label: "Discover" },
   { to: "/category/all", label: "Browse" },
-  { to: "/category/graphic-design", label: "Design" },
-  { to: "/category/photography", label: "Photography" },
-  { to: "/category/architecture", label: "Architecture" },
 ];
 
 export default function Navbar() {
@@ -158,6 +155,15 @@ export default function Navbar() {
                           </p>
                           <p className="text-xs text-gray-500 truncate">{user?.email}</p>
                         </div>
+                        {(user?.role === "manager" || user?.role === "staff") && (
+                          <Link
+                            to="/admin/books"
+                            onClick={() => setUserMenuOpen(false)}
+                            className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                          >
+                            Manage Books
+                          </Link>
+                        )}
                         <button
                           onClick={handleLogout}
                           className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
@@ -221,12 +227,23 @@ export default function Navbar() {
 
               <div className="pt-2 mt-2 border-t border-gray-100 mx-1">
                 {isAuthenticated ? (
-                  <button
-                    onClick={() => { handleLogout(); setMobileMenuOpen(false); }}
-                    className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-red-600 rounded-lg hover:bg-red-50 transition-colors"
-                  >
-                    <LogOut size={14} /> Sign out ({user?.first_name})
-                  </button>
+                  <>
+                    {(user?.role === "manager" || user?.role === "staff") && (
+                      <Link
+                        to="/admin/books"
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="block px-4 py-2.5 text-sm text-gray-700 rounded-lg hover:bg-gray-100"
+                      >
+                        Manage Books
+                      </Link>
+                    )}
+                    <button
+                      onClick={() => { handleLogout(); setMobileMenuOpen(false); }}
+                      className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-red-600 rounded-lg hover:bg-red-50 transition-colors"
+                    >
+                      <LogOut size={14} /> Sign out ({user?.first_name})
+                    </button>
+                  </>
                 ) : (
                   <div className="flex gap-2 px-1 pt-1">
                     <Link

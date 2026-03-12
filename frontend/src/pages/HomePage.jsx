@@ -1,36 +1,36 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Loader2 } from "lucide-react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import BookCard from "../components/BookCard";
 import CategoryFilter from "../components/CategoryFilter";
-import { books, categories, getFeaturedBooks } from "../data/books";
-
-const EDITORIAL_PICKS = [
-  {
-    label: "This Week's Editor Pick",
-    title: "Letters from M/M (Paris)",
-    subtitle: "Typography as emotion",
-    bookId: 1,
-    accent: "from-amber-50 to-orange-100",
-  },
-  {
-    label: "Staff Favourite",
-    title: "Dieter Rams: The Complete Works",
-    subtitle: "The bible of good design",
-    bookId: 5,
-    accent: "from-slate-50 to-gray-100",
-  },
-];
+import { useBooks } from "../hooks/useBooks";
+import { useCatalog } from "../hooks/useCatalog";
 
 export default function HomePage() {
   const [activeCategory, setActiveCategory] = useState("all");
+  const { results: books, loading, error } = useBooks({
+    page_size: 50,
+    ...(activeCategory !== "all" ? { category_id: activeCategory } : {}),
+  });
+  const { categories } = useCatalog();
 
-  const displayedBooks =
-    activeCategory === "all"
-      ? getFeaturedBooks()
-      : books.filter((b) => b.category === activeCategory).slice(0, 6);
+  // Fallback when API fails (backend not running, etc.)
+  const safeCategories = categories.length > 0 ? categories : [{ id: "all", name: "All", slug: "all" }];
+
+  const displayedBooks = useMemo(() => {
+    if (activeCategory === "all") return books.filter((b) => b.isNew).slice(0, 6);
+    return books.filter((b) => String(b.category_id) === String(activeCategory)).slice(0, 6);
+  }, [books, activeCategory]);
+
+  const editorialPicks = useMemo(() => {
+    if (books.length < 2) return [];
+    return [
+      { label: "This Week's Editor Pick", book: books[0], accent: "from-amber-50 to-orange-100" },
+      { label: "Staff Favourite", book: books[1], accent: "from-slate-50 to-gray-100" },
+    ];
+  }, [books]);
 
   return (
     <div className="min-h-screen flex flex-col bg-stone-50">
@@ -54,24 +54,36 @@ export default function HomePage() {
             <Link to="/category/all" className="btn-primary">
               Browse all books
             </Link>
-            <Link to="/category/graphic-design" className="btn-outline">
-              Graphic Design
-            </Link>
+            {safeCategories[1] && (
+              <Link to={`/category/${safeCategories[1].id}`} className="btn-outline">
+                {safeCategories[1].name}
+              </Link>
+            )}
           </div>
         </section>
 
         {/* ── Category Filter + Grid ─────────────────────────────────── */}
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+          {error && (
+            <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-xl text-sm text-amber-800">
+              Không thể tải dữ liệu. Kiểm tra backend đã chạy chưa (docker compose up).
+            </div>
+          )}
           {/* Filter */}
           <div className="flex items-center justify-between mb-8">
             <CategoryFilter
               activeCategory={activeCategory}
               onSelect={setActiveCategory}
+              categories={safeCategories}
             />
           </div>
 
           {/* Book grid */}
-          {displayedBooks.length > 0 ? (
+          {loading ? (
+            <div className="flex justify-center py-16">
+              <Loader2 size={32} className="animate-spin text-gray-400" />
+            </div>
+          ) : displayedBooks.length > 0 ? (
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-6 gap-x-5 gap-y-10">
               {displayedBooks.map((book) => (
                 <BookCard key={book.id} book={book} />
@@ -97,7 +109,7 @@ export default function HomePage() {
             >
               See all
               {activeCategory !== "all"
-                ? ` ${categories.find((c) => c.id === activeCategory)?.label}`
+                ? ` ${safeCategories.find((c) => c.id === activeCategory)?.name ?? ""}`
                 : " books"}
               <ArrowRight size={14} />
             </Link>
@@ -120,13 +132,13 @@ export default function HomePage() {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-              {EDITORIAL_PICKS.map((pick) => {
-                const book = books.find((b) => b.id === pick.bookId);
+              {editorialPicks.map((pick) => {
+                const book = pick.book;
                 if (!book) return null;
                 return (
                   <Link
-                    key={pick.bookId}
-                    to={`/book/${pick.bookId}`}
+                    key={book.id}
+                    to={`/book/${book.id}`}
                     className={`group relative overflow-hidden rounded-2xl bg-gradient-to-br ${pick.accent} p-8 flex gap-6 hover:shadow-md transition-shadow`}
                   >
                     <img
@@ -139,11 +151,11 @@ export default function HomePage() {
                         {pick.label}
                       </span>
                       <h3 className="font-serif text-xl font-semibold text-gray-900 leading-tight">
-                        {pick.title}
+                        {book.title}
                       </h3>
-                      <p className="text-sm text-gray-500 mt-1">{pick.subtitle}</p>
+                      <p className="text-sm text-gray-500 mt-1">{book.author}</p>
                       <p className="mt-3 text-sm font-semibold text-gray-900">
-                        ${book.price}
+                        ${book.price?.toFixed(2)}
                       </p>
                     </div>
                     <ArrowRight
@@ -163,7 +175,7 @@ export default function HomePage() {
             Browse by Category
           </h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
-            {categories.slice(1).map((cat) => (
+            {safeCategories.slice(1).map((cat) => (
               <Link
                 key={cat.id}
                 to={`/category/${cat.id}`}
@@ -171,11 +183,11 @@ export default function HomePage() {
               >
                 <div className="w-10 h-10 rounded-full bg-gray-50 group-hover:bg-gray-900 flex items-center justify-center transition-colors">
                   <span className="text-gray-500 group-hover:text-white transition-colors text-sm">
-                    {cat.label.charAt(0)}
+                    {(cat.name || cat.label || "").charAt(0)}
                   </span>
                 </div>
                 <span className="text-xs font-medium text-gray-700 leading-tight">
-                  {cat.label}
+                  {cat.name}
                 </span>
               </Link>
             ))}

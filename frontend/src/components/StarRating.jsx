@@ -32,9 +32,9 @@ export default function StarRating({ rating, reviewCount, size = "sm", showCount
           );
         })}
       </div>
-      {showCount && reviewCount !== undefined && (
+      {showCount && reviewCount != null && rating != null && (
         <span className="text-gray-500">
-          {rating.toFixed(1)}
+          {Number(rating).toFixed(1)}
           <span className="ml-1 text-gray-400">({reviewCount})</span>
         </span>
       )}

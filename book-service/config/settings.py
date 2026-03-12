@@ -68,5 +68,9 @@ REST_FRAMEWORK = {
 
 CORS_ALLOW_ALL_ORIGINS = True
 STATIC_URL = "/static/"
+
+# Validate JWT from manager-service or staff-service for write operations
+MANAGER_JWT_SECRET = config("MANAGER_JWT_SECRET", default="")
+STAFF_JWT_SECRET = config("STAFF_JWT_SECRET", default="")
 STATIC_ROOT = "/app/staticfiles"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"

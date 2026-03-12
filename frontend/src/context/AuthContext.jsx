@@ -61,6 +61,22 @@ export function AuthProvider({ children }) {
     }
   }, []);
 
+  const loginAsStaff = useCallback(async (email, password) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await authApi.loginStaff(email, password);
+      _persist(data.tokens.access, { ...data.staff, role: "staff" });
+      return { ok: true };
+    } catch (err) {
+      const msg = err.message || "Invalid staff credentials.";
+      setError(msg);
+      return { ok: false, error: msg };
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   const register = useCallback(async (payload) => {
     setLoading(true);
     setError(null);
@@ -94,6 +110,7 @@ export function AuthProvider({ children }) {
         clearError,
         login,
         loginAsAdmin,
+        loginAsStaff,
         register,
         logout,
       }}

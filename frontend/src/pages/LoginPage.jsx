@@ -10,7 +10,7 @@ const DECORATIVE_BOOKS = [
 ];
 
 export default function LoginPage() {
-  const { login, loginAsAdmin, loading, error, clearError, isAuthenticated } = useAuth();
+  const { login, loginAsAdmin, loginAsStaff, loading, error, clearError, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -19,6 +19,7 @@ export default function LoginPage() {
   const [form, setForm] = useState({ email: "", password: "" });
   const [showPw, setShowPw] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isStaff, setIsStaff] = useState(false);
   const [fieldErrors, setFieldErrors] = useState({});
 
   // Redirect if already logged in
@@ -44,9 +45,10 @@ export default function LoginPage() {
     if (Object.keys(errs).length) { setFieldErrors(errs); return; }
     setFieldErrors({});
 
-    const result = isAdmin
-      ? await loginAsAdmin(form.email, form.password)
-      : await login(form.email, form.password);
+    let result;
+    if (isAdmin) result = await loginAsAdmin(form.email, form.password);
+    else if (isStaff) result = await loginAsStaff(form.email, form.password);
+    else result = await login(form.email, form.password);
     if (result.ok) navigate(from, { replace: true });
   };
 
@@ -168,16 +170,35 @@ export default function LoginPage() {
               )}
             </div>
 
-            {/* Admin toggle */}
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={isAdmin}
-                onChange={(e) => setIsAdmin(e.target.checked)}
-                className="rounded border-gray-300 text-gray-900 focus:ring-gray-500"
-              />
-              <span className="text-sm text-gray-600">Login as Admin</span>
-            </label>
+            {/* Admin / Staff toggle */}
+            <div className="flex flex-wrap gap-4">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={isAdmin}
+                  onChange={(e) => {
+                    const v = e.target.checked;
+                    setIsAdmin(v);
+                    if (v) setIsStaff(false);
+                  }}
+                  className="rounded border-gray-300 text-gray-900 focus:ring-gray-500"
+                />
+                <span className="text-sm text-gray-600">Login as Admin</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={isStaff}
+                  onChange={(e) => {
+                    const v = e.target.checked;
+                    setIsStaff(v);
+                    if (v) setIsAdmin(false);
+                  }}
+                  className="rounded border-gray-300 text-gray-900 focus:ring-gray-500"
+                />
+                <span className="text-sm text-gray-600">Login as Staff</span>
+              </label>
+            </div>
 
             {/* Password */}
             <div>

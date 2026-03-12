@@ -6,6 +6,7 @@ import CategoryPage from "./pages/CategoryPage";
 import BookDetailPage from "./pages/BookDetailPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
+import AdminBooksPage from "./pages/AdminBooksPage";
 
 export default function App() {
   return (
@@ -17,6 +18,7 @@ export default function App() {
           <Route path="/book/:id" element={<BookDetailPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/admin/books" element={<AdminBooksPage />} />
         </Routes>
       </CartProvider>
     </AuthProvider>

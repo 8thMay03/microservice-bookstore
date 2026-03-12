@@ -5,6 +5,7 @@ import { useCart } from "../context/CartContext";
 
 export default function BookCard({ book, showRating = false }) {
   const { addToCart } = useCart();
+  if (!book) return null;
 
   return (
     <article className="book-card group cursor-pointer">
@@ -43,7 +44,7 @@ export default function BookCard({ book, showRating = false }) {
             </h3>
             <p className="text-xs text-gray-500 mt-0.5 truncate">{book.author}</p>
           </Link>
-          <p className="text-sm font-semibold text-gray-900 shrink-0">${book.price}</p>
+          <p className="text-sm font-semibold text-gray-900 shrink-0">${Number(book.price || 0).toFixed(2)}</p>
         </div>
 
         {showRating && (

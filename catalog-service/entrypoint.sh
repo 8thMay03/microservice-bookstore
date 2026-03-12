@@ -7,6 +7,12 @@ done
 echo "PostgreSQL is ready."
 
 python manage.py migrate --noinput
+python manage.py shell -c "
+from catalog.models import Category
+if not Category.objects.exists():
+    Category.objects.create(name='General', slug='general', description='General books')
+    print('Created default category')
+"
 python manage.py collectstatic --noinput
 
 exec gunicorn config.wsgi:application \

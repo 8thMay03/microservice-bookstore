@@ -167,6 +167,8 @@ services:
     environment:
       DEBUG: "True"
       SECRET_KEY: "book-secret-key-change-in-prod"
+      MANAGER_JWT_SECRET: "manager-secret-key-change-in-prod"
+      STAFF_JWT_SECRET: "staff-secret-key-change-in-prod"
       DB_NAME: book_db
       DB_USER: postgres
       DB_PASSWORD: postgres123
@@ -183,6 +185,8 @@ services:
     environment:
       DEBUG: "True"
       SECRET_KEY: "catalog-secret-key-change-in-prod"
+      MANAGER_JWT_SECRET: "manager-secret-key-change-in-prod"
+      STAFF_JWT_SECRET: "staff-secret-key-change-in-prod"
       DB_NAME: catalog_db
       DB_USER: postgres
       DB_PASSWORD: postgres123
