@@ -1,9 +1,14 @@
-import { createContext, useContext, useReducer, useState } from "react";
+import { createContext, useContext, useReducer, useState, useEffect } from "react";
+import { useAuth } from "./AuthContext";
 
 const CartContext = createContext(null);
 
+const CART_STORAGE_PREFIX = "bs_cart_";
+
 function cartReducer(state, action) {
   switch (action.type) {
+    case "SET":
+      return action.items ?? [];
     case "ADD": {
       const existing = state.find((i) => i.id === action.book.id);
       if (existing) {
@@ -30,9 +35,47 @@ function cartReducer(state, action) {
   }
 }
 
+function getCartKey(user) {
+  if (user?.id) return `${CART_STORAGE_PREFIX}user_${user.id}`;
+  return `${CART_STORAGE_PREFIX}guest`;
+}
+
+function loadCartFromStorage(key) {
+  try {
+    const raw = localStorage.getItem(key);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveCartToStorage(key, items) {
+  try {
+    localStorage.setItem(key, JSON.stringify(items));
+  } catch {
+    // ignore
+  }
+}
+
 export function CartProvider({ children }) {
+  const { user } = useAuth();
+  const cartKey = getCartKey(user);
+
   const [items, dispatch] = useReducer(cartReducer, []);
   const [isOpen, setIsOpen] = useState(false);
+
+  // Load cart when user changes (login/logout)
+  useEffect(() => {
+    const saved = loadCartFromStorage(cartKey);
+    dispatch({ type: "SET", items: saved });
+  }, [cartKey]);
+
+  // Save cart when items change
+  useEffect(() => {
+    saveCartToStorage(cartKey, items);
+  }, [cartKey, items]);
 
   const addToCart = (book) => {
     dispatch({ type: "ADD", book });
