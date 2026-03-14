@@ -15,6 +15,7 @@ import AdminOrdersPage from "./pages/AdminOrdersPage";
 import AdminRevenuePage from "./pages/AdminRevenuePage";
 import AdminStaffPage from "./pages/AdminStaffPage";
 import AdminUsersPage from "./pages/AdminUsersPage";
+import AdminAnalyticsPage from "./pages/AdminAnalyticsPage";
 
 export default function App() {
   return (
@@ -33,8 +34,9 @@ export default function App() {
             <Route path="/admin/books" element={<AdminBooksPage />} />
             <Route path="/admin/orders" element={<AdminOrdersPage />} />
             <Route path="/admin/revenue" element={<AdminRevenuePage />} />
-            <Route path="/admin/staff" element={<AdminStaffPage />} />
-            <Route path="/admin/users" element={<AdminUsersPage />} />
+                    <Route path="/admin/staff" element={<AdminStaffPage />} />
+                    <Route path="/admin/users" element={<AdminUsersPage />} />
+                    <Route path="/admin/analytics" element={<AdminAnalyticsPage />} />
           </Routes>
         </PageTransition>
       </CartProvider>

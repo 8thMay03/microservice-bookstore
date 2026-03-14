@@ -5,8 +5,9 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.conf import settings
 
-from .engine import get_recommendations
+from .engine import get_recommendations, item_based_similar
 from .models import RecommendationCache
+from .analytics import build_overview
 
 logger = logging.getLogger(__name__)
 
@@ -95,4 +96,49 @@ class RecommendationView(APIView):
         except requests.RequestException as exc:
             logger.warning("Could not fetch book details: %s", exc)
             return {}
+
+
+class ItemRecommendationView(APIView):
+    """
+    GET /api/recommendations/item/<book_id>/
+
+    \"Because you viewed X, you might like Y\" style suggestions.
+    """
+
+    def get(self, request, book_id):
+        limit = int(request.query_params.get("limit", 8))
+        recs = item_based_similar(book_id, limit)
+        book_details = RecommendationView._fetch_book_details([bid for bid, _ in recs])
+        results = []
+        for bid, score in recs:
+            detail = book_details.get(bid, {})
+            results.append(
+                {
+                    "book_id": bid,
+                    "score": round(score, 4),
+                    "title": detail.get("title", ""),
+                    "author": detail.get("author", ""),
+                    "price": detail.get("price"),
+                    "cover_image": detail.get("cover_image", ""),
+                    "category_id": detail.get("category_id"),
+                }
+            )
+        return Response(
+            {
+                "book_id": book_id,
+                "recommendations": results,
+            }
+        )
+
+
+class AnalyticsOverviewView(APIView):
+    """
+    GET /api/recommendations/analytics/overview/
+
+    Lightweight analytics for admin/marketing dashboards.
+    """
+
+    def get(self, request):
+        data = build_overview()
+        return Response(data, status=status.HTTP_200_OK)
 

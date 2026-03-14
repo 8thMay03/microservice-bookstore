@@ -53,3 +53,8 @@ export const adminStaffApi = {
   deactivate: (id, token) =>
     request(`/api/staff/${id}/`, { method: "DELETE" }, token),
 };
+
+export const adminAnalyticsApi = {
+  overview: (token) =>
+    request("/api/recommendations/analytics/overview/", {}, token),
+};

@@ -3,7 +3,7 @@ import { Link, NavLink, useNavigate } from "react-router-dom";
 import {
   Search, ShoppingBag, User, BookMarked,
   X, Menu, LogOut, ChevronDown, Package, Settings,
-  BookOpen, ClipboardList, DollarSign, Users, UserCog,
+  BookOpen, ClipboardList, DollarSign, Users, UserCog, Activity,
 } from "lucide-react";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
@@ -75,6 +75,7 @@ export default function Navbar() {
                   <li><NavLink to="/admin/revenue" className={navLinkClass}>Revenue</NavLink></li>
                   <li><NavLink to="/admin/staff" className={navLinkClass}>Staff</NavLink></li>
                   <li><NavLink to="/admin/users" className={navLinkClass}>Users</NavLink></li>
+                  <li><NavLink to="/admin/analytics" className={navLinkClass}>Analytics</NavLink></li>
                 </>
               )}
             </ul>
@@ -219,6 +220,10 @@ export default function Navbar() {
                         <Link to="/admin/users" onClick={() => setMobileMenuOpen(false)}
                           className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 rounded-lg hover:bg-gray-100">
                           <Users size={14} /> Users
+                        </Link>
+                        <Link to="/admin/analytics" onClick={() => setMobileMenuOpen(false)}
+                          className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 rounded-lg hover:bg-gray-100">
+                          <Activity size={14} /> Analytics
                         </Link>
                       </>
                     )}
