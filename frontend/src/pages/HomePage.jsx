@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, Loader2 } from "lucide-react";
 import Navbar from "../components/Navbar";
@@ -7,9 +7,44 @@ import BookCard from "../components/BookCard";
 import CategoryFilter from "../components/CategoryFilter";
 import { useBooks } from "../hooks/useBooks";
 import { useCatalog } from "../hooks/useCatalog";
+import { useAuth } from "../context/AuthContext";
+import { getRecommendations } from "../api/recommendations";
+
+const PLACEHOLDER_IMAGE = "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=600&q=80";
+
+/** Map recommendation item to book-like shape for BookCard */
+function recommendationToBook(r) {
+  return {
+    id: r.book_id,
+    title: r.title,
+    author: r.author,
+    price: r.price != null ? Number(r.price) : null,
+    image: r.cover_image || PLACEHOLDER_IMAGE,
+    category_id: r.category_id,
+  };
+}
 
 export default function HomePage() {
   const [activeCategory, setActiveCategory] = useState("all");
+  const { user, isAuthenticated } = useAuth();
+  const [recommendedBooks, setRecommendedBooks] = useState([]);
+  const [recommendationsLoading, setRecommendationsLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    setRecommendationsLoading(true);
+    const customerId = isAuthenticated && user?.id && user?.role === "customer" ? user.id : 0;
+    getRecommendations(customerId, { limit: 8 })
+      .then((data) => {
+        if (!cancelled && data.recommendations?.length) {
+          setRecommendedBooks(data.recommendations.map(recommendationToBook));
+        }
+      })
+      .catch(() => { if (!cancelled) setRecommendedBooks([]); })
+      .finally(() => { if (!cancelled) setRecommendationsLoading(false); });
+    return () => { cancelled = true; };
+  }, [isAuthenticated, user?.id, user?.role]);
+
   const { results: books, loading, error } = useBooks({
     page_size: 50,
     ...(activeCategory !== "all" ? { category_id: activeCategory } : {}),
@@ -60,6 +95,40 @@ export default function HomePage() {
               </Link>
             )}
           </div>
+        </section>
+
+        {/* ── Recommended for you / Popular picks ─────────────────────── */}
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 animate-fade-up animate-delay-1">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="font-serif text-2xl font-medium">
+              {isAuthenticated && user?.role === "customer"
+                ? "Recommended for you"
+                : "Popular picks"}
+            </h2>
+            <Link
+              to="/category/all"
+              className="text-sm text-gray-500 hover:text-gray-900 flex items-center gap-1 transition-colors"
+            >
+              View all <ArrowRight size={13} />
+            </Link>
+          </div>
+          {recommendationsLoading ? (
+            <div className="flex justify-center py-12">
+              <Loader2 size={28} className="animate-spin text-gray-400" />
+            </div>
+          ) : recommendedBooks.length > 0 ? (
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-8 gap-x-4 gap-y-8">
+              {recommendedBooks.map((book) => (
+                <BookCard key={book.id} book={book} />
+              ))}
+            </div>
+          ) : (
+            <p className="text-center py-8 text-gray-400 text-sm">
+              {isAuthenticated && user?.role === "customer"
+                ? "Mua thêm sách để nhận gợi ý cá nhân."
+                : "Chưa có dữ liệu gợi ý. Hãy khám phá danh mục sách."}
+            </p>
+          )}
         </section>
 
         {/* ── Category Filter + Grid ─────────────────────────────────── */}

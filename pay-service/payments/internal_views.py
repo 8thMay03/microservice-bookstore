@@ -23,8 +23,13 @@ class InternalProcessPaymentView(APIView):
         if existing:
             return Response(PaymentSerializer(existing).data)
 
-        # Simulate payment gateway (90% success rate in dev)
-        payment_success = random.random() < 0.9
+        # COD: no online charge, always "completed" (collect on delivery)
+        method = data.get("method", "CREDIT_CARD")
+        if method == "COD":
+            payment_success = True
+        else:
+            # Simulate payment gateway (90% success rate in dev)
+            payment_success = random.random() < 0.9
 
         payment = Payment.objects.create(
             order_id=data["order_id"],

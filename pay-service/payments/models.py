@@ -14,12 +14,13 @@ class Payment(models.Model):
         DEBIT_CARD = "DEBIT_CARD", "Debit Card"
         PAYPAL = "PAYPAL", "PayPal"
         BANK_TRANSFER = "BANK_TRANSFER", "Bank Transfer"
+        COD = "COD", "Cash on Delivery"
 
     order_id = models.IntegerField(unique=True, help_text="FK to order-service Order")
     customer_id = models.IntegerField(help_text="FK to customer-service Customer")
     amount = models.DecimalField(max_digits=12, decimal_places=2)
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING)
-    method = models.CharField(max_length=20, choices=Method.choices, default=Method.CREDIT_CARD)
+    method = models.CharField(max_length=30, choices=Method.choices, default=Method.CREDIT_CARD)
     transaction_id = models.UUIDField(default=uuid.uuid4, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

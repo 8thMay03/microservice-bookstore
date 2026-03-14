@@ -15,6 +15,8 @@ import {
   Send,
   Trash2,
   MessageSquare,
+  Pencil,
+  X,
 } from "lucide-react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
@@ -73,6 +75,8 @@ export default function BookDetailPage() {
   const [ratingLoading, setRatingLoading] = useState(false);
   const [commentText, setCommentText] = useState("");
   const [commentLoading, setCommentLoading] = useState(false);
+  const [editingComment, setEditingComment] = useState(null);
+  const [editText, setEditText] = useState("");
 
   const loadReviews = useCallback(async (bookId) => {
     try {
@@ -131,12 +135,25 @@ export default function BookDetailPage() {
     if (!isAuthenticated || !user?.id) return;
     setRatingLoading(true);
     try {
-      await reviewsApi.postRating({ book_id: Number(id), customer_id: user.id, score }, token);
-      setMyRating(score);
-      const summary = await reviewsApi.getRatingSummary(id);
-      setRatingSummary(summary);
-    } catch { /* ignore */ }
-    setRatingLoading(false);
+      await reviewsApi.postRating(
+        { book_id: Number(id), customer_id: user.id, score },
+        token
+      );
+      // Always refresh from server so it reflects the real saved value
+      await Promise.all([
+        loadMyRating(id, user.id),
+        (async () => {
+          const summary = await reviewsApi.getRatingSummary(id);
+          setRatingSummary(summary);
+        })(),
+      ]);
+    } catch (err) {
+      // Ít nhất log lỗi để dễ debug, và không nuốt luôn lỗi
+      // eslint-disable-next-line no-console
+      console.error("Failed to save rating", err);
+    } finally {
+      setRatingLoading(false);
+    }
   };
 
   const handleComment = async (e) => {
@@ -144,11 +161,27 @@ export default function BookDetailPage() {
     if (!commentText.trim() || !isAuthenticated || !user?.id) return;
     setCommentLoading(true);
     try {
-      await reviewsApi.postComment({ book_id: Number(id), customer_id: user.id, content: commentText.trim() }, token);
+      const customerName = [user.first_name, user.last_name].filter(Boolean).join(" ") || user.email || "";
+      await reviewsApi.postComment({
+        book_id: Number(id),
+        customer_id: user.id,
+        customer_name: customerName,
+        content: commentText.trim(),
+      }, token);
       setCommentText("");
       await loadReviews(id);
     } catch { /* ignore */ }
     setCommentLoading(false);
+  };
+
+  const handleEditComment = async (commentId) => {
+    if (!editText.trim()) return;
+    try {
+      await reviewsApi.updateComment(commentId, { content: editText.trim() }, token);
+      setEditingComment(null);
+      setEditText("");
+      await loadReviews(id);
+    } catch { /* ignore */ }
   };
 
   const handleDeleteComment = async (commentId) => {
@@ -362,6 +395,7 @@ export default function BookDetailPage() {
                     {myRating > 0 && (
                       <span className="text-sm text-gray-500">
                         Your rating: <span className="font-medium text-gray-700">{myRating}/5</span>
+                        <span className="ml-1.5 text-xs text-gray-400">(click to change)</span>
                       </span>
                     )}
                     {ratingLoading && <Loader2 size={16} className="animate-spin text-gray-400" />}
@@ -416,6 +450,11 @@ export default function BookDetailPage() {
                   </p>
                   {comments.map((c) => {
                     const isOwner = user?.id && c.customer_id === user.id;
+                    const isEditing = editingComment === c.id;
+                    const displayName = isOwner
+                      ? [user.first_name, user.last_name].filter(Boolean).join(" ") || user.email
+                      : c.customer_name || `User #${c.customer_id}`;
+                    const initial = displayName.charAt(0).toUpperCase();
                     const date = new Date(c.created_at).toLocaleDateString("en-US", {
                       year: "numeric", month: "short", day: "numeric",
                     });
@@ -424,12 +463,10 @@ export default function BookDetailPage() {
                         <div className="flex items-center justify-between mb-2">
                           <div className="flex items-center gap-3">
                             <div className="w-8 h-8 rounded-full bg-gray-200 text-gray-600 text-xs font-semibold flex items-center justify-center">
-                              {String(c.customer_id).charAt(0)}
+                              {initial}
                             </div>
                             <div>
-                              <span className="text-sm font-medium text-gray-900">
-                                {isOwner ? `${user.first_name} ${user.last_name}` : `User #${c.customer_id}`}
-                              </span>
+                              <span className="text-sm font-medium text-gray-900">{displayName}</span>
                               {isOwner && (
                                 <span className="ml-2 text-[10px] font-medium bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded">You</span>
                               )}
@@ -437,18 +474,55 @@ export default function BookDetailPage() {
                           </div>
                           <div className="flex items-center gap-2">
                             <span className="text-xs text-gray-400">{date}</span>
-                            {isOwner && (
-                              <button
-                                onClick={() => handleDeleteComment(c.id)}
-                                className="p-1 text-gray-400 hover:text-red-500 transition-colors"
-                                title="Delete comment"
-                              >
-                                <Trash2 size={13} />
-                              </button>
+                            {isOwner && !isEditing && (
+                              <>
+                                <button
+                                  onClick={() => { setEditingComment(c.id); setEditText(c.content); }}
+                                  className="p-1 text-gray-400 hover:text-blue-500 transition-colors"
+                                  title="Edit comment"
+                                >
+                                  <Pencil size={13} />
+                                </button>
+                                <button
+                                  onClick={() => handleDeleteComment(c.id)}
+                                  className="p-1 text-gray-400 hover:text-red-500 transition-colors"
+                                  title="Delete comment"
+                                >
+                                  <Trash2 size={13} />
+                                </button>
+                              </>
                             )}
                           </div>
                         </div>
-                        <p className="text-sm text-gray-600 leading-relaxed ml-11">{c.content}</p>
+                        {isEditing ? (
+                          <div className="ml-11 flex gap-2">
+                            <textarea
+                              value={editText}
+                              onChange={(e) => setEditText(e.target.value)}
+                              rows={2}
+                              className="flex-1 px-3 py-2 rounded-lg border border-gray-200 text-sm outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-200 resize-none"
+                            />
+                            <div className="flex flex-col gap-1">
+                              <button
+                                onClick={() => handleEditComment(c.id)}
+                                disabled={!editText.trim()}
+                                className="p-1.5 rounded-lg bg-gray-900 text-white hover:bg-gray-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                                title="Save"
+                              >
+                                <Check size={14} />
+                              </button>
+                              <button
+                                onClick={() => { setEditingComment(null); setEditText(""); }}
+                                className="p-1.5 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-100 transition-colors"
+                                title="Cancel"
+                              >
+                                <X size={14} />
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <p className="text-sm text-gray-600 leading-relaxed ml-11">{c.content}</p>
+                        )}
                       </div>
                     );
                   })}

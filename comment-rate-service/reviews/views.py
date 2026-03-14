@@ -76,7 +76,15 @@ class CommentListView(APIView):
 
 
 class CommentDetailView(APIView):
-    """DELETE /api/reviews/comments/<id>/"""
+    """PUT/DELETE /api/reviews/comments/<id>/"""
+
+    def put(self, request, pk):
+        comment = get_object_or_404(Comment, pk=pk)
+        content = request.data.get("content")
+        if content is not None:
+            comment.content = content
+            comment.save()
+        return Response(CommentSerializer(comment).data)
 
     def delete(self, request, pk):
         comment = get_object_or_404(Comment, pk=pk)

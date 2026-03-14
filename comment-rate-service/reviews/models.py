@@ -23,6 +23,7 @@ class Rating(models.Model):
 class Comment(models.Model):
     book_id = models.IntegerField(help_text="FK to book-service Book")
     customer_id = models.IntegerField(help_text="FK to customer-service Customer")
+    customer_name = models.CharField(max_length=200, blank=True, default="")
     content = models.TextField()
     is_approved = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)

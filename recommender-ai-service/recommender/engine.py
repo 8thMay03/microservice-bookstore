@@ -20,15 +20,18 @@ logger = logging.getLogger(__name__)
 
 
 def _fetch_all_orders() -> List[dict]:
-    """Fetch *all* completed orders from order-service for building the matrix."""
+    """Fetch all orders from order-service; we keep only PAID/SHIPPED/DELIVERED for the matrix."""
     try:
         resp = requests.get(
             f"{settings.ORDER_SERVICE_URL}/api/orders/",
-            params={"page_size": 1000},
             timeout=10,
         )
         resp.raise_for_status()
-        return resp.json()
+        orders = resp.json()
+        completed = {
+            "PAID", "SHIPPED", "DELIVERED",
+        }
+        return [o for o in orders if o.get("status") in completed]
     except requests.RequestException as exc:
         logger.error("Failed to fetch orders: %s", exc)
         return []

@@ -12,7 +12,7 @@ class RatingSerializer(serializers.ModelSerializer):
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
-        fields = ["id", "book_id", "customer_id", "content", "is_approved", "created_at"]
+        fields = ["id", "book_id", "customer_id", "customer_name", "content", "is_approved", "created_at"]
         read_only_fields = ["id", "is_approved", "created_at"]
 
 

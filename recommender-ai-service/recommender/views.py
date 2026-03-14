@@ -25,11 +25,30 @@ class RecommendationView(APIView):
         refresh = request.query_params.get("refresh", "false").lower() == "true"
 
         if not refresh:
-            cached = RecommendationCache.objects.filter(
-                customer_id=customer_id
-            ).order_by("-score")[:limit]
-            if cached.exists():
-                return Response(self._format_cached(cached))
+            cached = list(
+                RecommendationCache.objects.filter(
+                    customer_id=customer_id
+                ).order_by("-score").values_list("book_id", "score")[:limit]
+            )
+            if cached:
+                book_details = self._fetch_book_details([bid for bid, _ in cached])
+                results = []
+                for book_id, score in cached:
+                    detail = book_details.get(book_id, {})
+                    results.append({
+                        "book_id": book_id,
+                        "score": round(score, 4),
+                        "title": detail.get("title", ""),
+                        "author": detail.get("author", ""),
+                        "price": detail.get("price"),
+                        "cover_image": detail.get("cover_image", ""),
+                        "category_id": detail.get("category_id"),
+                    })
+                return Response({
+                    "customer_id": customer_id,
+                    "strategy": "cached",
+                    "recommendations": results,
+                })
 
         # Compute fresh recommendations
         recs = get_recommendations(customer_id, limit)
@@ -52,6 +71,7 @@ class RecommendationView(APIView):
                 "author": detail.get("author", ""),
                 "price": detail.get("price"),
                 "cover_image": detail.get("cover_image", ""),
+                "category_id": detail.get("category_id"),
             })
 
         return Response({
@@ -76,13 +96,3 @@ class RecommendationView(APIView):
             logger.warning("Could not fetch book details: %s", exc)
             return {}
 
-    @staticmethod
-    def _format_cached(cached_qs):
-        return {
-            "customer_id": cached_qs[0].customer_id if cached_qs else None,
-            "strategy": "cached",
-            "recommendations": [
-                {"book_id": r.book_id, "score": round(r.score, 4)}
-                for r in cached_qs
-            ],
-        }

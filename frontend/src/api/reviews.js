@@ -21,10 +21,16 @@ export const reviewsApi = {
   getComments: (bookId) =>
     request(`${BASE}/comments/?book_id=${bookId}`),
 
-  postComment: ({ book_id, customer_id, content }, token) =>
+  postComment: ({ book_id, customer_id, customer_name, content }, token) =>
     request(`${BASE}/comments/`, {
       method: "POST",
-      body: JSON.stringify({ book_id, customer_id, content }),
+      body: JSON.stringify({ book_id, customer_id, customer_name, content }),
+    }, token),
+
+  updateComment: (id, { content }, token) =>
+    request(`${BASE}/comments/${id}/`, {
+      method: "PUT",
+      body: JSON.stringify({ content }),
     }, token),
 
   deleteComment: (id, token) =>
