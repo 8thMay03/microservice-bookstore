@@ -11,7 +11,7 @@ if GOOGLE_API_KEY:
     genai.configure(api_key=GOOGLE_API_KEY)
 
 class HybridRAG:
-    def __init__(self, data_path="data/sample_knowledge.txt"):
+    def __init__(self, data_path="data/knowledge.txt"):
         self.documents = []
         self.bm25_corpus = []
         self.bm25_index = None
