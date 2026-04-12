@@ -6,7 +6,7 @@ networks:
 
 volumes:
   customer_db_data:
-  book_db_data:
+  product_db_data:
   catalog_db_data:
   cart_db_data:
   order_db_data:
@@ -34,14 +34,14 @@ services:
     networks:
       - bookstore-network
 
-  book-db:
+  product-db:
     image: postgres:15-alpine
     environment:
-      POSTGRES_DB: book_db
+      POSTGRES_DB: product_db
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres123
     volumes:
-      - book_db_data:/var/lib/postgresql/data
+      - product_db_data:/var/lib/postgresql/data
     networks:
       - bookstore-network
 
@@ -149,6 +149,8 @@ services:
   # ─────────────────────────────────────────────
   customer-service:
     build: ./customer-service
+    volumes:
+      - ./customer-service:/app
     environment:
       DEBUG: "True"
       SECRET_KEY: "customer-secret-key-change-in-prod"
@@ -164,26 +166,30 @@ services:
       - bookstore-network
     restart: unless-stopped
 
-  book-service:
-    build: ./book-service
+  product-service:
+    build: ./product-service
+    volumes:
+      - ./product-service:/app
     environment:
       DEBUG: "True"
-      SECRET_KEY: "book-secret-key-change-in-prod"
+      SECRET_KEY: "product-secret-key-change-in-prod"
       MANAGER_JWT_SECRET: "manager-secret-key-change-in-prod"
       STAFF_JWT_SECRET: "staff-secret-key-change-in-prod"
-      DB_NAME: book_db
+      DB_NAME: product_db
       DB_USER: postgres
       DB_PASSWORD: postgres123
-      DB_HOST: book-db
+      DB_HOST: product-db
       DB_PORT: "5432"
     depends_on:
-      - book-db
+      - product-db
     networks:
       - bookstore-network
     restart: unless-stopped
 
   catalog-service:
     build: ./catalog-service
+    volumes:
+      - ./catalog-service:/app
     environment:
       DEBUG: "True"
       SECRET_KEY: "catalog-secret-key-change-in-prod"
@@ -202,6 +208,8 @@ services:
 
   cart-service:
     build: ./cart-service
+    volumes:
+      - ./cart-service:/app
     environment:
       DEBUG: "True"
       SECRET_KEY: "cart-secret-key-change-in-prod"
@@ -218,6 +226,8 @@ services:
 
   order-service:
     build: ./order-service
+    volumes:
+      - ./order-service:/app
     environment:
       DEBUG: "True"
       SECRET_KEY: "order-secret-key-change-in-prod"
@@ -269,6 +279,8 @@ services:
 
   comment-rate-service:
     build: ./comment-rate-service
+    volumes:
+      - ./comment-rate-service:/app
     environment:
       DEBUG: "True"
       SECRET_KEY: "comment-secret-key-change-in-prod"
@@ -285,6 +297,7 @@ services:
 
   recommender-ai-service:
     build: ./recommender-ai-service
+
     environment:
       DEBUG: "True"
       SECRET_KEY: "recommender-secret-key-change-in-prod"
@@ -294,12 +307,13 @@ services:
       DB_HOST: recommender-db
       DB_PORT: "5432"
       ORDER_SERVICE_URL: "http://order-service:8000"
-      BOOK_SERVICE_URL: "http://book-service:8000"
+      PRODUCT_SERVICE_URL: "http://product-service:8000"
       COMMENT_RATE_SERVICE_URL: "http://comment-rate-service:8000"
       BEHAVIOR_MODEL_PATH: "/app/recommender/weights/behavior_model.pt"
       BEHAVIOR_DL_ENABLED: "True"
       BEHAVIOR_TORCH_DEVICE: "auto"
     volumes:
+      - ./recommender-ai-service:/app
       - recommender_behavior_weights:/app/recommender/weights
     depends_on:
       - recommender-db
@@ -309,6 +323,8 @@ services:
 
   staff-service:
     build: ./staff-service
+    volumes:
+      - ./staff-service:/app
     environment:
       DEBUG: "True"
       SECRET_KEY: "staff-secret-key-change-in-prod"
@@ -317,7 +333,7 @@ services:
       DB_PASSWORD: postgres123
       DB_HOST: staff-db
       DB_PORT: "5432"
-      BOOK_SERVICE_URL: "http://book-service:8000"
+      PRODUCT_SERVICE_URL: "http://product-service:8000"
     depends_on:
       - staff-db
     networks:
@@ -326,6 +342,8 @@ services:
 
   manager-service:
     build: ./manager-service
+    volumes:
+      - ./manager-service:/app
     environment:
       DEBUG: "True"
       SECRET_KEY: "manager-secret-key-change-in-prod"
@@ -372,7 +390,7 @@ services:
       DEBUG: "True"
       SECRET_KEY: "gateway-secret-key-change-in-prod"
       CUSTOMER_SERVICE_URL: "http://customer-service:8000"
-      BOOK_SERVICE_URL: "http://book-service:8000"
+      PRODUCT_SERVICE_URL: "http://product-service:8000"
       CATALOG_SERVICE_URL: "http://catalog-service:8000"
       CART_SERVICE_URL: "http://cart-service:8000"
       ORDER_SERVICE_URL: "http://order-service:8000"
@@ -385,7 +403,7 @@ services:
       RAG_SERVICE_URL: "http://rag-service:8000"
     depends_on:
       - customer-service
-      - book-service
+      - product-service
       - catalog-service
       - cart-service
       - order-service

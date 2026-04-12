@@ -73,7 +73,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Inter-service URLs
 ORDER_SERVICE_URL = config("ORDER_SERVICE_URL", default="http://order-service:8000")
-BOOK_SERVICE_URL = config("BOOK_SERVICE_URL", default="http://book-service:8000")
+PRODUCT_SERVICE_URL = config("PRODUCT_SERVICE_URL", default="http://product-service:8000")
 COMMENT_RATE_SERVICE_URL = config(
     "COMMENT_RATE_SERVICE_URL", default="http://comment-rate-service:8000"
 )
