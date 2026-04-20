@@ -132,7 +132,7 @@ class HybridRAG:
 
     def chat(self, user_message: str):
         if not GOOGLE_API_KEY:
-            return "Xin lỗi, Server chưa được cấu hình GOOGLE_API_KEY. Quản trị viên vui lòng thêm API Key vào hệ thống (docker-compose.yml)."
+            return "Xin lỗi, Server chưa được cấu hình GOOGLE_API_KEY. Quản trị viên vui lòng đặt biến trong file .env ở thư mục gốc project (xem .env.example)."
             
         # Lấy ngữ cảnh (Context Retrieval)
         retrieved_contexts = self.search_hybrid(user_message, top_k=3)

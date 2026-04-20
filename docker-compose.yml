@@ -369,7 +369,8 @@ services:
   rag-service:
     build: ./rag-service
     environment:
-      GOOGLE_API_KEY: "AIzaSyDhE_hNTq_mEqHeEIryUTX9htnbNiThVKs"
+      # Set in repo-root .env (not committed). Docker Compose loads .env for substitution.
+      GOOGLE_API_KEY: ${GOOGLE_API_KEY:-}
     networks:
       - bookstore-network
     restart: unless-stopped
