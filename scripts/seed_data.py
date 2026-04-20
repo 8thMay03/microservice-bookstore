@@ -243,18 +243,55 @@ SAMPLE_PRODUCTS = [
      "sku": "SP-ADS-SOCC-5", "attributes": {"size": 5, "material": "PU", "color": "White/Black"}},
 ]
 
-CUSTOMERS = [
-    {"email": "user1@example.com", "first_name": "Alice", "last_name": "Nguyen", "phone": "0901234567", "address": "123 Hanoi"},
-    {"email": "user2@example.com", "first_name": "Bob", "last_name": "Tran", "phone": "0912345678", "address": "456 Ho Chi Minh"},
-    {"email": "user3@example.com", "first_name": "Carol", "last_name": "Le", "phone": "0923456789", "address": "789 Da Nang"},
-    {"email": "user4@example.com", "first_name": "David", "last_name": "Pham", "phone": "0934567890", "address": "101 Can Tho"},
-    {"email": "user5@example.com", "first_name": "Eve", "last_name": "Hoang", "phone": "0945678901", "address": "202 Hue"},
-    {"email": "user6@example.com", "first_name": "Frank", "last_name": "Vo", "phone": "0956789012", "address": "303 Nha Trang"},
-    {"email": "user7@example.com", "first_name": "Grace", "last_name": "Dang", "phone": "0967890123", "address": "404 Hai Phong"},
-    {"email": "user8@example.com", "first_name": "Henry", "last_name": "Bui", "phone": "0978901234", "address": "505 Vung Tau"},
-    {"email": "user9@example.com", "first_name": "Ivy", "last_name": "Do", "phone": "0989012345", "address": "606 Dalat"},
-    {"email": "user10@example.com", "first_name": "Jack", "last_name": "Ly", "phone": "0990123456", "address": "707 Quy Nhon"},
+# Number of sample customers (user1@example.com … user{N}@example.com). Order rows use customer_id 1..N.
+NUM_SAMPLE_CUSTOMERS = 50
+
+_FIRST_NAMES = (
+    "Alice Bob Carol David Eve Frank Grace Henry Ivy Jack Ken Linh Minh Nga Oanh Phuc Quan Rosa Son Thao "
+    "An Binh Chi Dung Giang Hai Hoa Hue Khanh Lan Mai Nam Phuong Quynh Sang Tam Uyen Viet Xuan Yen Zach"
+).split()
+
+_LAST_NAMES = (
+    "Nguyen Tran Le Pham Hoang Vo Dang Bui Do Ly Phan Vu Truong Dinh Ngo Huynh Cao "
+    "Duong Bui La Trieu Dang Mach Ton Van Dam"
+).split()
+
+_ADDRESS_BASES = [
+    "123 Tran Hung Dao, Hanoi",
+    "456 Nguyen Hue, Ho Chi Minh City",
+    "789 Bach Dang, Da Nang",
+    "101 Hai Ba Trung, Can Tho",
+    "202 Le Loi, Hue",
+    "303 Tran Phu, Nha Trang",
+    "404 Dien Bien Phu, Hai Phong",
+    "505 Thuy Van, Vung Tau",
+    "606 Nguyen Cong Tru, Dalat",
+    "707 Xuan Dieu, Quy Nhon",
 ]
+
+
+def _build_sample_customers(n: int) -> list:
+    """Deterministic sample rows; phones are synthetic 10-digit strings."""
+    out = []
+    for i in range(n):
+        num = i + 1
+        fn = _FIRST_NAMES[i % len(_FIRST_NAMES)]
+        ln = _LAST_NAMES[i % len(_LAST_NAMES)]
+        addr = _ADDRESS_BASES[i % len(_ADDRESS_BASES)] + f" (Customer #{num})"
+        phone = "09" + f"{num:08d}"
+        out.append(
+            {
+                "email": f"user{num}@example.com",
+                "first_name": fn,
+                "last_name": ln,
+                "phone": phone,
+                "address": addr,
+            }
+        )
+    return out
+
+
+CUSTOMERS = _build_sample_customers(NUM_SAMPLE_CUSTOMERS)
 
 # pass: Password123!
 
@@ -366,7 +403,11 @@ else:
 
 
 def seed_customers():
-    print("5. Creating 10 customer accounts (user1@example.com ... user10@example.com / " + DEFAULT_PASSWORD + ")...")
+    print(
+        f"5. Creating {NUM_SAMPLE_CUSTOMERS} customer accounts "
+        f"(user1@example.com … user{NUM_SAMPLE_CUSTOMERS}@example.com / "
+        + DEFAULT_PASSWORD + ")..."
+    )
     customers_json = json.dumps(CUSTOMERS)
     code = f"""
 from customers.models import Customer
@@ -386,10 +427,12 @@ print("Customers:", Customer.objects.count())
 
 
 def seed_orders():
-    print("6. Creating sample orders for customers...")
-    products_mini = [{"id": i+1, "title": p["title"], "price": p["price"]} for i, p in enumerate(SAMPLE_PRODUCTS)]
+    print("6. Creating sample orders (skewed toward completed) for all customers...")
+    products_mini = [{"id": i + 1, "title": p["title"], "price": p["price"]} for i, p in enumerate(SAMPLE_PRODUCTS)]
     products_json = json.dumps(products_mini)
-    
+    addresses_json = json.dumps([c["address"] for c in CUSTOMERS])
+    nc = NUM_SAMPLE_CUSTOMERS
+
     code = f"""
 from orders.models import Order, OrderItem
 from decimal import Decimal
@@ -401,16 +444,17 @@ if Order.objects.exists():
     Order.objects.all().delete()
 
 products = json.loads('''{products_json}''')
-statuses = ["PENDING", "CONFIRMED", "PAID", "SHIPPED", "DELIVERED", "CANCELLED", "REFUNDED"]
-addresses = [
-    "123 Hanoi", "456 Ho Chi Minh", "789 Da Nang", "101 Can Tho", "202 Hue",
-    "303 Nha Trang", "404 Hai Phong", "505 Vung Tau", "606 Dalat", "707 Quy Nhon"
-]
+addresses = json.loads('''{addresses_json}''')
+# Heavier weight on completed orders so recommender / analytics have realistic history.
+_status_pool = (
+    ["PAID"] * 22 + ["SHIPPED"] * 18 + ["DELIVERED"] * 22
+    + ["PENDING"] * 8 + ["CONFIRMED"] * 6 + ["CANCELLED"] * 2 + ["REFUNDED"] * 2
+)
 orders_created = 0
-for cid in range(1, 11):
-    num_orders = random.randint(6, 10)
+for cid in range(1, {nc + 1}):
+    num_orders = random.randint(5, 12)
     for _ in range(num_orders):
-        status = random.choice(statuses)
+        status = random.choice(_status_pool)
         address = addresses[cid - 1]
         order = Order.objects.create(
             customer_id=cid,
@@ -419,9 +463,9 @@ for cid in range(1, 11):
             shipping_address=address,
             payment_method=random.choice(["CREDIT_CARD", "PAYPAL", "CASH_ON_DELIVERY"])
         )
-        
+
         total = Decimal('0.00')
-        num_items = random.randint(1, 4)
+        num_items = random.randint(1, 5)
         items = random.sample(products, num_items)
         for item in items:
             qty = random.randint(1, 3)
@@ -437,10 +481,39 @@ for cid in range(1, 11):
         order.total_amount = total
         order.save()
         orders_created += 1
-        
+
 print("Orders created:", orders_created)
 """
     return run_exec("order-service", code)
+
+
+def seed_behavior_events():
+    """Synthetic view / click / add_to_cart for recommender-ai-service behavior model."""
+    print("7. Seeding recommender behavior events (view, click, add_to_cart)...")
+    n_products = len(SAMPLE_PRODUCTS)
+    nc = NUM_SAMPLE_CUSTOMERS
+    code = f"""
+from recommender.models import CustomerBehaviorEvent
+import random
+
+CustomerBehaviorEvent.objects.all().delete()
+_event_choices = ("view", "click", "add_to_cart")
+_weights = (48, 32, 20)
+_batch = []
+for cid in range(1, {nc + 1}):
+    n_events = random.randint(25, 70)
+    for _ in range(n_events):
+        pid = random.randint(1, {n_products})
+        ev = random.choices(_event_choices, weights=_weights, k=1)[0]
+        _batch.append(CustomerBehaviorEvent(
+            customer_id=cid,
+            product_id=pid,
+            event_type=ev,
+        ))
+CustomerBehaviorEvent.objects.bulk_create(_batch, batch_size=1000)
+print("Behavior events created:", CustomerBehaviorEvent.objects.count())
+"""
+    return run_exec("recommender-ai-service", code)
 
 
 def main():
@@ -456,14 +529,19 @@ def main():
     ok &= seed_staff()
     ok &= seed_customers()
     ok &= seed_orders()
+    ok &= seed_behavior_events()
 
     print()
     if ok:
         print("Done! Summary:")
         print("  - Admin:  admin@store.com / " + DEFAULT_PASSWORD)
         print("  - Staff:  staff@store.com / " + DEFAULT_PASSWORD)
-        print("  - Users:  user1@example.com ... user10@example.com / " + DEFAULT_PASSWORD)
-        print("  - Sample orders created for users!")
+        print(
+            f"  - Users:  user1@example.com … user{NUM_SAMPLE_CUSTOMERS}@example.com / "
+            + DEFAULT_PASSWORD
+        )
+        print("  - Sample orders (mostly PAID/SHIPPED/DELIVERED) for all customers.")
+        print("  - Behavior events (view / click / add_to_cart) in recommender-ai-service.")
     else:
         print("Some steps failed. Check errors above.")
         sys.exit(1)
