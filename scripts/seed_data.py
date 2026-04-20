@@ -12,6 +12,59 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_PASSWORD = "Password123!"
 
+# Demo accounts: user1@example.com … user{N}@example.com (same password DEFAULT_PASSWORD)
+NUM_SAMPLE_CUSTOMERS = 500
+
+_FIRST_NAMES = (
+    "Alice Bob Carol David Eve Frank Grace Henry Ivy Jack Ken Linh Minh Nga Oanh Phuc Quan Rosa Son Thao "
+    "An Binh Chi Dung Giang Hai Hoa Hue Khanh Lan Mai Nam Phuong Quynh Sang Tam Uyen Viet Xuan Yen Zach "
+    "Alex Belle Chris Dana Erik Fiona Gail Hugo Ines Jake Kate Leo Mara Nate Olga Pete Quinn Rita Steve Tina "
+    "Uma Vick Wendy Yuri Zara Adam Beth Carl Dana Evan Fay Gina Hank Iris Jean Kyle Luna Mark Nina Owen Pam "
+    "Quin Ruby Sean Tara Uma Vince Will Xena Yves Zoe"
+).split()
+
+_LAST_NAMES = (
+    "Nguyen Tran Le Pham Hoang Vo Dang Bui Do Ly Phan Vu Truong Dinh Ngo Huynh Cao Duong La Trieu Mach "
+    "Ton Van Dam Phung Ta Dang Bui Chau Lam Quach Dao Ton Vuong"
+).split()
+
+_ADDRESS_BASES = [
+    "123 Tran Hung Dao, Hanoi",
+    "456 Nguyen Hue, Ho Chi Minh City",
+    "789 Bach Dang, Da Nang",
+    "101 Hai Ba Trung, Can Tho",
+    "202 Le Loi, Hue",
+    "303 Tran Phu, Nha Trang",
+    "404 Dien Bien Phu, Hai Phong",
+    "505 Thuy Van, Vung Tau",
+    "606 Nguyen Cong Tru, Dalat",
+    "707 Xuan Dieu, Quy Nhon",
+]
+
+
+def _build_sample_customers(n: int) -> list:
+    """Synthetic customers; phones are 10-digit strings starting with 09."""
+    out = []
+    for i in range(n):
+        num = i + 1
+        fn = _FIRST_NAMES[i % len(_FIRST_NAMES)]
+        ln = _LAST_NAMES[i % len(_LAST_NAMES)]
+        addr = _ADDRESS_BASES[i % len(_ADDRESS_BASES)] + f" (Customer #{num})"
+        phone = "09" + f"{num:08d}"
+        out.append(
+            {
+                "email": f"user{num}@example.com",
+                "first_name": fn,
+                "last_name": ln,
+                "phone": phone,
+                "address": addr,
+            }
+        )
+    return out
+
+
+CUSTOMERS = _build_sample_customers(NUM_SAMPLE_CUSTOMERS)
+
 # Category slug -> ID mapping (after seed, IDs are 1-based in creation order)
 # Updated for ecommerce with subcategories (parent IDs are the root categories)
 CATEGORY_SLUG_TO_ID = {
@@ -243,22 +296,9 @@ SAMPLE_PRODUCTS = [
      "sku": "SP-ADS-SOCC-5", "attributes": {"size": 5, "material": "PU", "color": "White/Black"}},
 ]
 
-CUSTOMERS = [
-    {"email": "user1@example.com", "first_name": "Alice", "last_name": "Nguyen", "phone": "0901234567", "address": "123 Hanoi"},
-    {"email": "user2@example.com", "first_name": "Bob", "last_name": "Tran", "phone": "0912345678", "address": "456 Ho Chi Minh"},
-    {"email": "user3@example.com", "first_name": "Carol", "last_name": "Le", "phone": "0923456789", "address": "789 Da Nang"},
-    {"email": "user4@example.com", "first_name": "David", "last_name": "Pham", "phone": "0934567890", "address": "101 Can Tho"},
-    {"email": "user5@example.com", "first_name": "Eve", "last_name": "Hoang", "phone": "0945678901", "address": "202 Hue"},
-    {"email": "user6@example.com", "first_name": "Frank", "last_name": "Vo", "phone": "0956789012", "address": "303 Nha Trang"},
-    {"email": "user7@example.com", "first_name": "Grace", "last_name": "Dang", "phone": "0967890123", "address": "404 Hai Phong"},
-    {"email": "user8@example.com", "first_name": "Henry", "last_name": "Bui", "phone": "0978901234", "address": "505 Vung Tau"},
-    {"email": "user9@example.com", "first_name": "Ivy", "last_name": "Do", "phone": "0989012345", "address": "606 Dalat"},
-    {"email": "user10@example.com", "first_name": "Jack", "last_name": "Ly", "phone": "0990123456", "address": "707 Quy Nhon"},
-]
-
 # pass: Password123!
 
-def run_exec(service: str, cmd: str) -> bool:
+def run_exec(service: str, cmd: str, timeout: int = 120) -> bool:
     """Run command in Docker Compose service. Returns True on success."""
     full_cmd = [
         "docker", "compose", "exec", "-T", service,
@@ -270,7 +310,7 @@ def run_exec(service: str, cmd: str) -> bool:
             cwd=PROJECT_ROOT,
             capture_output=True,
             text=True,
-            timeout=60,
+            timeout=timeout,
         )
         if result.returncode != 0:
             print(f"  Error: {result.stderr or result.stdout}")
@@ -326,7 +366,7 @@ for product in Product.objects.all():
 print("Products:", Product.objects.count())
 print("Created:", created_count, "Updated:", updated_count)
 """
-    return run_exec("product-service", code)
+    return run_exec("product-service", code, timeout=120)
 
 
 def seed_admin():
@@ -344,7 +384,7 @@ if created:
 else:
     print("Admin already exists")
 """
-    return run_exec("manager-service", code)
+    return run_exec("manager-service", code, timeout=120)
 
 
 def seed_staff():
@@ -362,13 +402,20 @@ if created:
 else:
     print("Staff already exists")
 """
-    return run_exec("staff-service", code)
+    return run_exec("staff-service", code, timeout=120)
 
 
 def seed_customers():
-    print("5. Creating 10 customer accounts (user1@example.com ... user10@example.com / " + DEFAULT_PASSWORD + ")...")
-    customers_json = json.dumps(CUSTOMERS)
-    code = f"""
+    n = NUM_SAMPLE_CUSTOMERS
+    print(
+        f"5. Creating {n} customer accounts "
+        f"(user1@example.com … user{n}@example.com / {DEFAULT_PASSWORD}) in batches…"
+    )
+    batch_size = 60
+    for start in range(0, len(CUSTOMERS), batch_size):
+        chunk = CUSTOMERS[start : start + batch_size]
+        customers_json = json.dumps(chunk)
+        code = f"""
 from customers.models import Customer
 import json
 data = json.loads('''{customers_json}''')
@@ -380,16 +427,22 @@ for d in data:
     if created:
         u.set_password("Password123!")
         u.save()
-print("Customers:", Customer.objects.count())
+print("Batch done; total customers:", Customer.objects.count())
 """
-    return run_exec("customer-service", code)
+        if not run_exec("customer-service", code, timeout=300):
+            return False
+    return True
 
 
 def seed_orders():
-    print("6. Creating sample orders for customers...")
-    products_mini = [{"id": i+1, "title": p["title"], "price": p["price"]} for i, p in enumerate(SAMPLE_PRODUCTS)]
+    nc = NUM_SAMPLE_CUSTOMERS
+    print(f"6. Creating sample orders for {nc} customers (may take a few minutes)…")
+    products_mini = [
+        {"id": i + 1, "title": p["title"], "price": p["price"]}
+        for i, p in enumerate(SAMPLE_PRODUCTS)
+    ]
     products_json = json.dumps(products_mini)
-    
+
     code = f"""
 from orders.models import Order, OrderItem
 from decimal import Decimal
@@ -401,17 +454,20 @@ if Order.objects.exists():
     Order.objects.all().delete()
 
 products = json.loads('''{products_json}''')
-statuses = ["PENDING", "CONFIRMED", "PAID", "SHIPPED", "DELIVERED", "CANCELLED", "REFUNDED"]
+_status_pool = (
+    ["PAID"] * 22 + ["SHIPPED"] * 18 + ["DELIVERED"] * 22
+    + ["PENDING"] * 8 + ["CONFIRMED"] * 6 + ["CANCELLED"] * 2 + ["REFUNDED"] * 2
+)
 addresses = [
     "123 Hanoi", "456 Ho Chi Minh", "789 Da Nang", "101 Can Tho", "202 Hue",
-    "303 Nha Trang", "404 Hai Phong", "505 Vung Tau", "606 Dalat", "707 Quy Nhon"
+    "303 Nha Trang", "404 Hai Phong", "505 Vung Tau", "606 Dalat", "707 Quy Nhon",
 ]
 orders_created = 0
-for cid in range(1, 11):
-    num_orders = random.randint(6, 10)
+for cid in range(1, {nc + 1}):
+    num_orders = random.randint(2, 5)
     for _ in range(num_orders):
-        status = random.choice(statuses)
-        address = addresses[cid - 1]
+        status = random.choice(_status_pool)
+        address = addresses[(cid - 1) % len(addresses)] + f" — Customer {{cid}}"
         order = Order.objects.create(
             customer_id=cid,
             status=status,
@@ -419,8 +475,7 @@ for cid in range(1, 11):
             shipping_address=address,
             payment_method=random.choice(["CREDIT_CARD", "PAYPAL", "CASH_ON_DELIVERY"])
         )
-        
-        total = Decimal('0.00')
+        total = Decimal("0.00")
         num_items = random.randint(1, 4)
         items = random.sample(products, num_items)
         for item in items:
@@ -432,15 +487,15 @@ for cid in range(1, 11):
                 product_id=item["id"],
                 product_title=item["title"],
                 quantity=qty,
-                unit_price=price
+                unit_price=price,
             )
         order.total_amount = total
         order.save()
         orders_created += 1
-        
+
 print("Orders created:", orders_created)
 """
-    return run_exec("order-service", code)
+    return run_exec("order-service", code, timeout=1800)
 
 
 def main():
@@ -471,7 +526,10 @@ def main():
         print("Done! Summary:")
         print("  - Admin:  admin@store.com / " + DEFAULT_PASSWORD)
         print("  - Staff:  staff@store.com / " + DEFAULT_PASSWORD)
-        print("  - Users:  user1@example.com ... user10@example.com / " + DEFAULT_PASSWORD)
+        print(
+            f"  - Users:  user1@example.com … user{NUM_SAMPLE_CUSTOMERS}@example.com / "
+            + DEFAULT_PASSWORD
+        )
         print("  - Sample orders created for users!")
     else:
         print("Some steps failed. Check errors above.")
