@@ -1,0 +1,79 @@
+=== THÔNG TIN CỬA HÀNG VÀ THƯƠNG HIỆU ===
+Cửa hàng bán gì?
+Chúng tôi là một cửa hàng thương mại điện tử đa ngành (Ecommerce Store), cung cấp đa dạng các ngành hàng bao gồm: Sách, Điện tử & Máy tính, Thời trang, Thực phẩm & Đồ uống, Nhà cửa & Đời sống, Cắm trại & Thể thao.
+Tất cả sản phẩm đều là hàng chính hãng. Chúng tôi hỗ trợ giao hàng (ship) toàn quốc với thời gian nhanh và giá hợp lý.
+
+=== GIỜ LÀM VIỆC VÀ KÊNH HỖ TRỢ ===
+Tổng đài và chat hỗ trợ hoạt động từ 8h00 đến 22h00 tất cả các ngày trong tuần. Hotline: 1900-1234. Email hỗ trợ: support@microservice-bookstore.com. Ngoài giờ này bạn vẫn có thể đặt hàng trên website; yêu cầu sẽ được xử lý theo thứ tự vào ngày làm việc tiếp theo. Người phụ trách: Nguyễn Khôi.
+
+=== CÁCH TÌM SẢN PHẨM VÀ MUA HÀNG TRÊN WEBSITE ===
+Dùng thanh Tìm kiếm (Search) ở phía trên để gõ tên sản phẩm, thương hiệu hoặc từ khóa. Bấm Add to Cart (Thêm vào giỏ). Kiểm tra giỏ hàng, nhập địa chỉ và hoàn tất đơn theo hướng dẫn. Nếu giao dịch bị từ chối hoặc không hoàn tất, hãy thử đổi phương thức thanh toán.
+
+=== PHÍ VẬN CHUYỂN VÀ MIỄN PHÍ SHIP ===
+Đơn hàng từ $50 trở lên được miễn phí giao hàng. Đơn dưới $50 áp dụng phí ship mặc định $5. Phí hiển thị trước khi bạn xác nhận thanh toán. Thời gian giao hàng từ 2 đến 5 ngày.
+
+=== ĐỔI TRẢ VÀ HOÀN TIỀN ===
+Khách hàng có thể yêu cầu đổi hoặc trả sản phẩm trong vòng 7 ngày kể từ ngày nhận hàng. Nhận hoàn tiền từ 3-14 ngày. Nếu thiếu hàng xin báo ngay trong 48h qua hotline.
+
+=== DANH SÁCH CHI TIẾT CÁC SẢN PHẨM ĐANG BÁN TRONG HỆ THỐNG ===
+
+[SÁCH & TRI THỨC]
+1. Letters from M/M (Paris) - Tác giả/Hãng: M/M Paris. Giá: $39. (328 trang, Tiếng Anh). Mô tả: Khảo sát chi tiết về xưởng thiết kế M/M Paris - nơi xoá nhòa ranh giới giữa nghệ thuật và đồ họa thương mại.
+2. Clean Code - Tác giả: Robert C. Martin. Giá: $34. (464 trang). Mô tả: Cẩm nang về nghệ thuật viết phần mềm và duy trì mã nguồn sạch dành cho lập trình viên.
+3. Dieter Rams: The Complete Works - Tác giả: Klaus Klemp. Giá: $29. (480 trang). Mô tả: Chuyên đề giới thiệu về Dieter Rams và các nguyên tắc thiết kế đỉnh cao của ông.
+4. Sapiens: A Brief History of Humankind - Tác giả: Yuval Noah Harari. Giá: $22. (498 trang). Mô tả: Cuốn sách tóm tắt lịch sử tiến hóa của nhân loại.
+5. The Pragmatic Programmer - Tác giả: Andrew Hunt & David Thomas. Giá: $38. (352 trang). Mô tả: Lời khuyên cho kỹ sư phần mềm hiện đại và sự tinh thông trong nghề.
+6. Deep Work - Tác giả: Cal Newport. Giá: $18. (304 trang). Mô tả: Các quy tắc giúp tăng cường độ tập trung làm việc chuyên sâu trong thế giới xao nhãng.
+7. A Brief History of Time - Tác giả: Stephen Hawking. Giá: $17. (212 trang). Mô tả: Sách về nguồn gốc vũ trụ từ Big Bang tới hệ thống hố đen.
+8. The Martian - Tác giả: Andy Weir. Giá: $15. (387 trang). Mô tả: Tiểu thuyết sinh tồn kịch tính trên sao Hỏa bằng khoa học và kỹ thuật.
+9. Atomic Habits - Tác giả: James Clear. Giá: $19. (320 trang). Mô tả: Các thay đổi nhỏ tạo ra kết quả lớn (thói quen, tư duy).
+10. Guns, Germs, and Steel - Tác giả: Jared Diamond. Giá: $21. (528 trang). Mô tả: Luận điệu tranh cãi về địa lý ảnh hưởng thế nào đến sự hình thành văn minh loài người.
+11. Introduction to Algorithms - Tác giả: Thomas H. Cormen. Giá: $99. (1312 trang). Mô tả: Từ điển bách khoa toàn thư về mọi loại Thuật toán trong tin học.
+
+[ĐIỆN TỬ & KỸ THUẬT SỐ]
+12. Sony WH-1000XM5 Wireless Headphones - Hãng: Sony. Giá: $349. Mô tả: Tai nghe chụp tai chống ồn hàng đầu, pin lên đến 30 tiếng. Màu: Black.
+13. MacBook Air M3 15-inch - Hãng: Apple. Giá: $1299. Mô tả: Laptop siêu mỏng nhẹ, pin trâu, tích hợp chip M3 siêu phân luồng, RAM 8GB, 256GB SSD. Màu: Midnight.
+14. iPhone 15 Pro 128GB - Hãng: Apple. Giá: $999. Mô tả: Điện thoại khung viền Titanium, camera xịn xò với USB Type C.
+15. Samsung Galaxy S24 256GB - Hãng: Samsung. Giá: $899. Mô tả: Smartphone Android đầu bảng, màn hình sắc nét. Màu: Onyx Black.
+16. iPad Air 11-inch Wi-Fi 128GB - Hãng: Apple. Giá: $599. Mô tả: Kích thước mỏng nhẹ hoàn hảo cho công việc lẫn giải trí. Màu: Starlight.
+17. Dell XPS 13 (i7 / 16GB / 512GB) - Hãng: Dell. Giá: $1199. Mô tả: Premium Ultrabook với cấu hình i7 mạnh mẽ, màn hình viền siêu mỏng. Màu: Platinum Silver.
+18. Logitech MX Master 3S Mouse - Hãng: Logitech. Giá: $99. Mô tả: Chuột công thái học cao cấp dành cho văn phòng, lăn siêu tốc. Màu: Graphite.
+19. Keychron K2 Mechanical Keyboard - Hãng: Keychron. Giá: $89. Mô tả: Bàn phím cơ không dây layout 75%, sử dụng Brown Switch dễ bấm.
+20. Canon EOS R50 Mirrorless Camera - Hãng: Canon. Giá: $679. Mô tả: Máy ảnh nhỏ gọn dành cho nhu cầu chụp hàng ngày và creator quay 4K.
+21. Anker 20W USB-C Charger - Hãng: Anker. Giá: $19. Mô tả: Củ sạc nhanh nhỏ gọn chuẩn PD 20W.
+
+[QUẦN ÁO TRANH TRÍ & THỜI TRANG]
+22. Classic Fit Oxford Shirt - Hãng: Ralph Lauren. Giá: $89. Mô tả: Sơ mi nam Oxford cotton thoáng khí. Màu: Trắng. Trải dài size S tới XL.
+23. Women's Premium Running Shoes - Hãng: Nike. Giá: $129. Mô tả: Giày chạy nữ xốp giảm va chấn. Màu: Hot Pink.
+24. Men's Slim Jeans - Hãng: Levi's. Giá: $79. Mô tả: Quần Jeans nam dáng Slim-fit màu xanh Indigo. Giãn nhẹ, năng động.
+25. Women's Oversized Hoodie - Hãng: Adidas. Giá: $69. Mô tả: Áo khoác hoodie rộng thỏai mái lót nỉ nhung êm ái. Màu: Heather Grey.
+26. Kids Cotton T-Shirt Pack (3) - Hãng: Uniqlo. Giá: $24. Mô tả: Bộ 3 áo phông nhí 100% Cotton thoáng.
+27. Leather Chelsea Boots - Hãng: Clarks. Giá: $149. Mô tả: Bốt Chelsea cổ điển, đế da lộn màu Dark Brown phong trần.
+28. Women's Summer Dress - Hãng: Zara. Giá: $59. Mô tả: Váy hè dáng buông với thiết kế hoa cỏ mát mẻ (Floral Viscose).
+
+[THỰC PHẨM & ĐỒ UỐNG]
+29. Organic Matcha Green Tea Powder - Hãng: Jade Leaf. Giá: $24. Mô tả: Bột trà xanh Matcha hữu cơ tinh khiết nhập khẩu từ Uji, Nhật Bản (100g). Vị đắng nhẹ, thơm ngon tự nhiên.
+30. Cold Brew Coffee Concentrate - Hãng: Stumptown. Giá: $16. Mô tả: Cà phê Cold Brew đậm đặc đóng chai 500ml uống liền.
+31. Sea Salt Dark Chocolate Bar - Hãng: Lindt. Giá: $5. Mô tả: Sô-cô-la đen nguyên chất (70% Cacao) thanh 100g phủ muối biển.
+32. Roasted Almonds (Unsalted) - Hãng: Planters. Giá: $8. Mô tả: Hạnh nhân sấy giòn không muối, 400g.
+33. Sparkling Water Variety Pack - Hãng: LaCroix. Giá: $12. Mô tả: Thùng lốc 12 lon nước uống có ga đa dạng hương vị, không đường.
+34. Organic Extra Virgin Olive Oil - Hãng: Bertolli. Giá: $14. Mô tả: Dầu ô-liu Ép lạnh 100% hữu cơ, dủng trộn Salad hay xào nấu chuyên sâu (750ml).
+
+[NHÀ CỬA, NỘI THẤT & TRANG TRÍ]
+35. Scandinavian Oak Coffee Table - Hãng: IKEA. Giá: $199. Mô tả: Bàn sofa / bàn cà phê gỗ Sồi nguyên khối, kích thước 120x60x45cm. Phong cách Bắc Âu.
+36. Ergonomic Office Chair - Hãng: Herman Miller. Giá: $999. Mô tả: Chiếc ghế công thái học đắt đỏ tốt nhất thế giới dành cho dân IT và phòng làm việc. Bảo hành 12 năm.
+37. Nonstick Frying Pan 28cm - Hãng: Tefal. Giá: $39. Mô tả: Chảo chống dính 28cm dành cho nhà bếp, độ bền rất cao.
+38. Stainless Steel Chef Knife 8-inch - Hãng: Victorinox. Giá: $49. Mô tả: Dao cắt bếp bằng thép không gỉ trứ danh. Lưỡi dài 8-inch.
+39. Minimalist Wall Clock - Hãng: Muji. Giá: $29. Mô tả: Đồng hồ treo tường siêu tối giản.
+40. Scented Candle - Vanilla - Hãng: Yankee Candle. Giá: $19. Mô tả: Nến thơm hương cam Vanilla nhẹ nhàng, lưu hương tốt giúp thư giãn đầu óc. Khối lượng 400g, cháy 45h.
+
+[DỤNG CỤ THỂ THAO & DÃ NGOẠI]
+41. Adjustable Dumbbell Set 20kg - Hãng: Bowflex. Giá: $179. Mô tả: Bộ tạ đa năng cho phép điều chỉnh cân nặng qua ngàm gắn cực kỳ tiện ích lên đến 20kg.
+42. Yoga Mat 6mm - Hãng: Manduka. Giá: $79. Mô tả: Thảm tập yoga cao cấp dày 6 ly màu đen tĩnh mịch, độ bám sàn lý tưởng, chất liệu chịu mài mòn chuẩn PVC.
+43. Running Water Bottle 500ml - Hãng: Nike. Giá: $14. Mô tả: Bình đựng nước khi điền kinh dung tích 500ml siêu nhẹ.
+44. Camping Tent 2-Person - Hãng: Coleman. Giá: $119. Mô tả: Lều cắm trại bung nhanh dánh cho 2 người, chống nước chuẩn.
+45. Outdoor Hiking Backpack 30L - Hãng: Osprey. Giá: $149. Mô tả: Balo leo núi việt dã cao cấp Osprey dung tích 30 lit siêu thoáng khí.
+46. Soccer Ball - Match Size 5 - Hãng: Adidas. Giá: $29. Mô tả: Bóng đá thông dụng kích thước size 5 cho các trận bóng sân cỏ.
+
+=== LƯU Ý KHI SỬ DỤNG TRỢ LÝ AI ===
+Trợ lý chỉ trả lời nội dung chính sách, sản phẩm tồn tại trong danh sách để tư vấn khách mua hàng. Giá cả cập nhật trong db nên ưu tiên giá giỏ hàng. Gọi 1900-1234 nếu bạn cần hỗ trợ xử lý cụ thể cho đơn.
