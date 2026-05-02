@@ -9,6 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.database import Base, engine
 from app.routes.behavior import router as behavior_router
 from app.routes.recommendations import router as recommendations_router
+from app.routes.behavior_prediction import router as behavior_prediction_router
 
 logging.basicConfig(
     level=logging.INFO,
@@ -48,6 +49,11 @@ app.include_router(
     behavior_router,
     prefix="/api/behavior",
     tags=["behavior"],
+)
+app.include_router(
+    behavior_prediction_router,
+    prefix="/api/predictions",
+    tags=["behavior-prediction"],
 )
 
 
